@@ -1,17 +1,21 @@
 import WebSocket from "ws";
 import { Chess } from "chess.js";
+import { Player } from "./gameManger";
+
 export class Game {
-  public player1: WebSocket;
-  public player2: WebSocket;
+  public gameid: string;
+  public player1: Player;
+  public player2: Player;
   public board: Chess;
   private startTime: Date;
 
-  constructor(p1: WebSocket, p2: WebSocket) {
+  constructor(p1: Player, p2: Player) {
     this.player1 = p1;
     this.player2 = p2;
     this.board = new Chess();
     this.startTime = new Date();
-    this.player1.send(
+    this.gameid = "random string";
+    this.player1.websocket.send(
       JSON.stringify({
         type: "init_game",
         payload: {
@@ -19,7 +23,7 @@ export class Game {
         },
       })
     );
-    this.player2.send(
+    this.player2.websocket.send(
       JSON.stringify({
         type: "init_game",
         payload: {
@@ -45,7 +49,7 @@ export class Game {
     }
 
     if (this.board.isGameOver()) {
-      this.player1.send(
+      this.player1.websocket.send(
         JSON.stringify({
           type: "game_over",
           payload: {
@@ -53,7 +57,7 @@ export class Game {
           },
         })
       );
-      this.player2.send(
+      this.player2.websocket.send(
         JSON.stringify({
           type: "game_over",
           payload: {
@@ -65,7 +69,7 @@ export class Game {
     }
 
     if (this.board.turn() === "b") {
-      this.player2.send(
+      this.player2.websocket.send(
         JSON.stringify({
           type: "move",
           payload: {
@@ -74,7 +78,7 @@ export class Game {
         })
       );
     } else {
-      this.player1.send(
+      this.player1.websocket.send(
         JSON.stringify({
           type: "move",
           payload: {

@@ -8,13 +8,14 @@ class Game {
         this.player2 = p2;
         this.board = new chess_js_1.Chess();
         this.startTime = new Date();
-        this.player1.send(JSON.stringify({
+        this.gameid = "random string";
+        this.player1.websocket.send(JSON.stringify({
             type: "init_game",
             payload: {
                 color: "white",
             },
         }));
-        this.player2.send(JSON.stringify({
+        this.player2.websocket.send(JSON.stringify({
             type: "init_game",
             payload: {
                 color: "black",
@@ -31,13 +32,13 @@ class Game {
             return;
         }
         if (this.board.isGameOver()) {
-            this.player1.send(JSON.stringify({
+            this.player1.websocket.send(JSON.stringify({
                 type: "game_over",
                 payload: {
                     winner: this.board.turn() === "w" ? "black" : "white",
                 },
             }));
-            this.player2.send(JSON.stringify({
+            this.player2.websocket.send(JSON.stringify({
                 type: "game_over",
                 payload: {
                     winner: this.board.turn() === "w" ? "black" : "white",
@@ -46,7 +47,7 @@ class Game {
             return;
         }
         if (this.board.turn() === "b") {
-            this.player2.send(JSON.stringify({
+            this.player2.websocket.send(JSON.stringify({
                 type: "move",
                 payload: {
                     move: move,
@@ -54,7 +55,7 @@ class Game {
             }));
         }
         else {
-            this.player1.send(JSON.stringify({
+            this.player1.websocket.send(JSON.stringify({
                 type: "move",
                 payload: {
                     move: move,
