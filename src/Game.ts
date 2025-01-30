@@ -20,6 +20,8 @@ export class Game {
         type: "init_game",
         payload: {
           color: "white",
+          photoURL: p2.photoURL,
+          displayName: p2.displayName,
         },
       })
     );
@@ -28,6 +30,8 @@ export class Game {
         type: "init_game",
         payload: {
           color: "black",
+          photoURL: p1.photoURL,
+          displayName: p1.displayName,
         },
       })
     );

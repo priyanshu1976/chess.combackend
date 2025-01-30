@@ -15,6 +15,7 @@ class gameManger {
         this.games = [];
         this.Users = [];
         this.pendingUsers = [];
+        this.privateUsers = []; // * Initialize privateUsers
     }
     addUser(socket) {
         this.Users.push({ websocket: socket, playerid: "hello", gameid: "string" });
@@ -35,20 +36,54 @@ class gameManger {
                     //start the game
                     const game = new Game_1.Game(randomUser, {
                         websocket: socket,
-                        playerid: "lol",
+                        playerid: message.uid,
+                        photoURL: message.photoURL,
+                        displayName: message.displayName,
                     });
-                    // console.log(randomUser);
                     this.games.push(game);
                     // update the player array and remove the random user
                     this.pendingUsers = this.pendingUsers.filter((player) => {
-                        return player === randomUser;
+                        return player.playerid !== randomUser.playerid;
                     });
                     console.log("game started");
                 }
                 else {
-                    this.pendingUsers.push({ websocket: socket, playerid: "hello" });
+                    this.pendingUsers.push({
+                        websocket: socket,
+                        playerid: message.uid,
+                        gameid: generateRandomString(),
+                        photoURL: message.photoURL,
+                        displayName: message.displayName,
+                    });
                     console.log("pending user added");
+                    console.log(this.pendingUsers);
                 }
+            }
+            if (message.type === "create_game") {
+                const { gameid } = message;
+                console.log(gameid);
+                console.log(message);
+                const user = this.privateUsers.find((user) => user.gameid === gameid);
+                if (user) {
+                    const game = new Game_1.Game(user, {
+                        websocket: socket,
+                        playerid: message.uid,
+                        photoURL: message.photoURL,
+                        displayName: message.displayName,
+                    });
+                    socket.send(JSON.stringify({
+                        type: "opp",
+                        user: user,
+                    }));
+                    this.games.push(game);
+                }
+                this.privateUsers.push({
+                    websocket: socket,
+                    playerid: message.uid,
+                    gameid: message.gameid,
+                    photoURL: message.photoURL,
+                    displayName: message.displayName,
+                });
             }
             if (message.type === "move") {
                 console.log("makemove");
